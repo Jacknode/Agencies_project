@@ -8,6 +8,7 @@ import AgenciesUsers from '@/components/AgenciesUsers' //景区商户信息
 import Management from '@/components/Management' //旅行社管理
 import TravelAgencyProducts from '@/components/TravelAgencyProducts' //旅行社产品信息
 import TravelAgencyOrder from '@/components/TravelAgencyOrder' //旅行社产品信息
+import Editor from '@/components/Editor' //
 
 export default [
   {
@@ -53,6 +54,14 @@ export default [
           User: TravelAgencyOrder
         },
         name:'travelAgencyOrder'
+      },
+      {
+        path: 'editor',
+        components: {
+          default: Home,
+          User: Editor
+        },
+        name:'Editor'
       }
     ],
   },

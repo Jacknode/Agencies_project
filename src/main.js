@@ -13,6 +13,10 @@ import store from './store'
 import axios from 'axios'
 import * as filters from './filters'
 import qs from 'qs';
+import '../static/UE/ueditor.config.js'
+import '../static/UE/ueditor.all.min.js'
+import '../static/UE/lang/zh-cn/zh-cn.js'
+import '../static/UE/ueditor.parse.min.js'
 axios.interceptors.request.use((config) => {
   config.data = qs.stringify(config.data);
   return config;

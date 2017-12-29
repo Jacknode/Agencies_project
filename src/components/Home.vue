@@ -209,4 +209,7 @@
 .el-loading-spinner .circular{
   margin-left: 50%;
 }
+  .edui-default{
+    z-index: 3000 !important;
+  }
 </style>

@@ -112,7 +112,7 @@
       </template>
     </div>
     <!--商户添加-->
-    <el-dialog title="商户添加" :visible.sync="dialogAddFormVisible">
+    <el-dialog title="商户添加" :visible.sync="dialogAddFormVisible" width="60%">
       <el-form :model="BusinessUser">
         <el-form-item label="商家编号" :label-width="formLabelWidth" :required="isOff">
           <el-input v-model="BusinessUser.tb_UserID" auto-complete="off"></el-input>
@@ -152,9 +152,9 @@
         </el-form-item>
         <el-form-item label="展示图片地址:" :label-width="formLabelWidth">
           <a href="javascript:;" class="file">展示图片上传
-            <input type="file" name=""  ref="upload"  accept="image/*">
+            <input type="file" name=""  ref="upload"  accept="image/*" multiple>
           </a>
-          <span>{{ImageURL?ImageURL:""}}</span>
+          <p v-for="item in ImageURL" v-show="ImageURL.length">{{item?item:""}}</p>
         </el-form-item>
         <el-form-item label="营业执照图:" :label-width="formLabelWidth">
           <a href="javascript:;" class="file">营业执照上传
@@ -179,6 +179,13 @@
         <el-form-item label="备注" :label-width="formLabelWidth">
           <el-input v-model="BusinessUser.tb_Remark" auto-complete="off" type="textarea" :rows="3"></el-input>
         </el-form-item>
+          <el-form-item label="备注">
+          <div class="editor-container">
+            <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
+          </div>
+          </el-form-item>
+
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogAddFormVisible = false">取 消</el-button>
@@ -300,6 +307,7 @@
   import {checkPhone} from '../assets/js/date'//电话号码验证
   import {getObj} from '../assets/js/date'//电话号码验证
   import {POST} from '../assets/js/universal'
+  import UE from './ue/ue.vue';
 
   export default{
     computed:mapGetters([
@@ -307,8 +315,15 @@
       'updateBusinessUser'
     ]),
     name: '',
+    components: {UE},
     data(){
       return {
+        defaultMsg: '这里是UE测试212121111',
+        config: {
+          initialFrameWidth: null,
+          initialFrameHeight: 350
+        },
+        ue1: "ue1",
         ImageURL:[],//旅行社商家展示图片地址
         tbBussinessLicenceURL:'',//旅行社营业执照图
         isLoading:false,
@@ -435,6 +450,18 @@
       },
       //添加商户提交
       addSubmit(){
+        var ueObj = {
+          ueObjString:''
+        }
+        let content = this.$refs.ue.getUEContent(); // 调用子组件方法
+        this.$notify({
+          title: '获取成功，可在控制台查看！',
+          message: content,
+          type: 'success'
+        });
+        ueObj.ueObjString = content;
+        this.$store.commit('ueObjList',ueObj)
+        return;
 
         if(this.BusinessUser.tb_CertNo.trim()==''
           ||this.BusinessUser.tb_Phone.trim()==''

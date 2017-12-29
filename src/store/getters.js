@@ -47,5 +47,6 @@ export default {
   },
   orderParentList: state => state.orderParentList,
   orderChildList: state => state.orderChildList,
-  screenOrderChildArray:state => state.screenOrderChildArray
+  screenOrderChildArray:state => state.screenOrderChildArray,
+  ueObjList:state=> state.ueObjList
 }

@@ -23,7 +23,8 @@ const state = {
   orderParentList:[],
   orderChildList:[],
   screenOrderChildList:[],
-  screenOrderChildArray:[]
+  screenOrderChildArray:[],
+  ueObjList:{}
 };
 const mutations = {
   clearData(state){
@@ -287,8 +288,10 @@ const mutations = {
         return false
       }
     })
+  },
+  ueObjList(state,obj){
+    state.ueObjList = obj;
   }
-
 };
 
 //获取是否可售
