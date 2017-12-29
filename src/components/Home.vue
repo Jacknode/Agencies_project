@@ -86,6 +86,9 @@
                       <li>
                         <router-link to="/home/travelAgencyOrder">旅行社订单管理</router-link>
                       </li>
+                      <!--<li>-->
+                        <!--<router-link to="/home/demo">demo</router-link>-->
+                      <!--</li>-->
 
                     </ul>
                   </li>
@@ -153,9 +156,33 @@
       }
       var user = sessionStorage.getItem('admin');
       this.qiankeUser = user;
+      var GetAgentItemList = {
+        loginUserID: 'huileyou',
+        loginUserPass: 123,
+        iD: '',
+        itemName: name ? name : '',
+        userName: '',
+        isDelete: 0,
+        page: 1,
+        rows: 5,
+      }
+      this.$http.post('http://114.55.248.116:1111/TravelAgentService.asmx/GetAgentItemList', {
+        paramJson: JSON.stringify(GetAgentItemList)
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+        .then(data => {
+          var data = data.data;
+          if (Number(data.backCode) == 200) {
+            this.$store.commit('initManagement', data.itemInfoList)
+          }
+        })
     },
     watch: {
       '$route' (to, from) {
+        this.$store.commit('clearData')
         // 对路由变化作出响应...
         if(this.transtionActive.isActive&&this.transtionActive.isRotateInDownRight){
           this.$store.commit('setTranstionFalse')
@@ -178,6 +205,8 @@
     }
   }
 </script>
-<style scoped>
-
+<style>
+.el-loading-spinner .circular{
+  margin-left: 50%;
+}
 </style>

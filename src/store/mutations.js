@@ -14,15 +14,21 @@ const state = {
   initManagement: {},//初始化修改旅行社栏目
   initTravelAgencyProducts: [],//初始化产品信息
   updateInitAgencyProducts: {updateAgencyVal: ''},//初始化产品修改数据
-  initTravelAgencyOrder: [],//初始化订单信息
   //初始化动画
   transtionActive: {
     isActive: false,
     isRotateInDownRight: false
   },
   initUpdateOrders: {},//初始化修改订单
+  orderParentList:[],
+  orderChildList:[],
+  screenOrderChildList:[],
+  screenOrderChildArray:[]
 };
 const mutations = {
+  clearData(state){
+    state.scenicUsers = state.scenicUsersKeyWord = [];
+  },
   //用户系统用户
   setUsers(state, data){
     state.users = data;
@@ -68,13 +74,12 @@ const mutations = {
   },
   //初始化修改数据
   initUpdateBusiness(state, id){
-    let data = state.scenicUsersKeyWord.filter(item => {
+    state.updateBusinessUser = state.scenicUsersKeyWord.filter(item => {
       if (item.tb_UserID == id) {
         return true
       }
       return false
     })[0]
-    state.updateBusinessUser = getObj(data);
   },
   updateBusiness(state, data){
     state.scenicUsersKeyWord = state.scenicUsersKeyWord.map(item => {
@@ -258,26 +263,32 @@ const mutations = {
   clearTravelAgencyOrder(state){
     state.initTravelAgencyOrder = [];
   },
-  //初始化订单信息
-  setInitTravelAgencyOrder(state, data){
-    for (var i = 0; i < data.length; i++) {
-      for (var j = 0; j < state.scenicUsersKeyWord.length; j++) {
-        if (Number(data[i].to_TouristBussinessID) == Number(state.scenicUsersKeyWord[j].tb_UserID)) {
-          data[i].userName = state.scenicUsersKeyWord[j].name;
-        }
-      }
-    }
-    state.initTravelAgencyOrder = data;
-  },
   //初始化修改订单
   initOrderUpdateObj(orderId){
 
   },
   //注销订单
   filterOrder(state, orderId){
-    console.log(orderId)
     state.initTravelAgencyOrder = newFilter(state.initTravelAgencyOrder, orderId, 'to_OrderID')
+  },
+  initOrderParentList(state,data){
+    state.orderParentList = [];
+    state.orderParentList.push(data)
+
+  },
+  initOrderChildList(state,data){
+    state.orderChildList = data;
+  },
+  screenOrderChildList(state,orderID){
+    state.screenOrderChildArray = state.orderChildList.filter(item=>{
+      if(item.ts_to_od_OrderID === orderID){
+        return true
+      }else {
+        return false
+      }
+    })
   }
+
 };
 
 //获取是否可售

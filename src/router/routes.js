@@ -27,7 +27,7 @@ export default [
         components: {
           default: Home,
           User: AgenciesUsers
-          },
+        },
         name:'getUser'
       },
       {

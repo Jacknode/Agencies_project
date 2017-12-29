@@ -16,6 +16,7 @@
         </el-select>
         <input type="text" placeholder="输入内容" v-model="content">
         <a href="javascript:;" class="btn btn-info" @click="search">搜索</a>
+        <a href="javascript:;" class="btn btn-info" @click="addTravelAgencyProductsUser">添加 </a>
       </div>
       <table class="table datatable-show-all">
         <thead>
@@ -39,19 +40,19 @@
           <td>¥ {{item.gl_Price}}</td>
           <td>{{item.gl_ExpireTime}}</td>
           <td>{{item.availableName}}</td>
-          <td>{{item.gl_Content?item.gl_Content:'暂无内容'}}</td>
-          <td>{{item.gl_Remark?item.gl_Remark:'暂无备注'}}</td>
+          <td>{{item.gl_Content ? item.gl_Content : '暂无内容'}}</td>
+          <td>{{item.gl_Remark ? item.gl_Remark : '暂无备注'}}</td>
           <td class="text-center">
             <ul class="icons-list">
               <li class="dropdown">
                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
                   <i class="icon-menu9"></i>
                 </a>
-
                 <ul class="dropdown-menu dropdown-menu-right">
-                  <li><a href="javascript:;" @click="addTravelAgencyProductsUser"><i class="icon-add"></i>添加 </a></li>
-                  <li><a href="javascript:;" @click="updateTravelAgencyProducts(item.gl_ID)"><i class="icon-pencil"></i> 修改</a></li>
-                  <li><a href="javascript:;" @click="deleteTravelAgencyProducts(item.gl_ID)"><i class="icon-delicious"></i> 删除</a></li>
+                  <li><a href="javascript:;" @click="updateTravelAgencyProducts(item.gl_ID)"><i class="icon-pencil"></i>
+                    修改</a></li>
+                  <li><a href="javascript:;" @click="deleteTravelAgencyProducts(item.gl_ID)"><i
+                    class="icon-delicious"></i> 删除</a></li>
                 </ul>
               </li>
             </ul>
@@ -63,20 +64,15 @@
     <!--添加产品-->
     <el-dialog title="添加产品" :visible.sync="addTravelAgencyProducts">
       <el-form :model="AddTravelAgencyProducts">
-        <el-form-item label="产品编号" :label-width="formLabelWidth" :required="isOff">
-          <el-input v-model="AddTravelAgencyProducts.glID" auto-complete="off"></el-input>
+        <el-form-item label="商家名称" :label-width="formLabelWidth">
+          <el-autocomplete
+            v-model="userName"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入商家"
+            @select="handleSelect"
+          ></el-autocomplete>
         </el-form-item>
-        <el-form-item label="旅行社商户名称" :label-width="'130px'" :required="isOff">
-          <el-select v-model="scenicUsersKeyWordVal" placeholder="请选择旅行社商户">
-            <el-option
-              v-for="item in scenicUsersKeyWord"
-              :key="item.tb_UserID"
-              :label="item.tb_Name"
-              :value="item.tb_UserID">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="产品栏目名称" :label-width="formLabelWidth"  :required="isOff">
+        <el-form-item label="产品栏目名称" :label-width="formLabelWidth" :required="isOff">
           <el-select v-model="TravelAgencyVal" placeholder="请选择产品栏目">
             <el-option
               v-for="item in managementUserKeyWord"
@@ -89,10 +85,22 @@
         <el-form-item label="产品标题" :label-width="formLabelWidth">
           <el-input v-model="AddTravelAgencyProducts.glTitle" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="产品价格" :label-width="formLabelWidth"  :required="isOff">
+        <el-form-item label="产品编号" :label-width="formLabelWidth" :required="isOff">
+          <el-input v-model="AddTravelAgencyProducts.glID" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="产品内容" :label-width="formLabelWidth">
+          <el-input v-model="AddTravelAgencyProducts.glContent" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="产品价格" :label-width="formLabelWidth" :required="isOff">
           <el-input v-model="AddTravelAgencyProducts.glPrice" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth"  label="产品过期时间"  :required="isOff">
+        <el-form-item label="是否可售" :label-width="formLabelWidth" :required="isOff">
+          <el-select v-model="AddTravelAgencyProducts.addTravelAgencyVal" placeholder="请选择是否可售">
+            <el-option label="是" value="1"></el-option>
+            <el-option label="否" value="0"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="产品过期时间" :required="isOff">
           <el-date-picker
             v-model="AddTravelAgencyProducts.dateVal"
             type="date"
@@ -100,15 +108,6 @@
             value-format="yyyy-MM-dd"
           >
           </el-date-picker>
-        </el-form-item>
-        <el-form-item label="是否可售" :label-width="formLabelWidth"  :required="isOff">
-          <el-select v-model="AddTravelAgencyProducts.addTravelAgencyVal" placeholder="请选择是否可售">
-            <el-option label="是" value="1"></el-option>
-            <el-option label="否" value="0"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="产品内容" :label-width="formLabelWidth">
-          <el-input v-model="AddTravelAgencyProducts.glContent" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="备注" :label-width="formLabelWidth">
           <el-input v-model="AddTravelAgencyProducts.glRemark" auto-complete="off"></el-input>
@@ -125,17 +124,15 @@
         <el-form-item label="产品编号" :label-width="formLabelWidth" :required="isOff">
           <el-input v-model="UpdateTravelAgencyProducts.gl_ID" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="旅行社商户名称" :label-width="'130px'" :required="isOff">
-          <el-select v-model="scenicUsersKeyWordVal" placeholder="请选择旅行社商户">
-            <el-option
-              v-for="item in scenicUsersKeyWord"
-              :key="item.tb_UserID"
-              :label="item.tb_Name"
-              :value="item.tb_UserID">
-            </el-option>
-          </el-select>
+        <el-form-item label="旅行社商户名称" :label-width="formLabelWidth">
+          <el-autocomplete
+            v-model="userName"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请选择旅行社商户"
+            @select="updateHandleSelect"
+          ></el-autocomplete>
         </el-form-item>
-        <el-form-item label="产品栏目名称" :label-width="formLabelWidth"  :required="isOff">
+        <el-form-item label="产品栏目名称" :label-width="formLabelWidth" :required="isOff">
           <el-select v-model="TravelAgencyVal" placeholder="请选择产品栏目">
             <el-option
               v-for="item in managementUserKeyWord"
@@ -148,10 +145,10 @@
         <el-form-item label="产品标题" :label-width="formLabelWidth">
           <el-input v-model="UpdateTravelAgencyProducts.gl_Title" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="产品价格" :label-width="formLabelWidth"  :required="isOff">
+        <el-form-item label="产品价格" :label-width="formLabelWidth" :required="isOff">
           <el-input v-model="UpdateTravelAgencyProducts.gl_Price" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth"  label="产品过期时间"  :required="isOff">
+        <el-form-item :label-width="formLabelWidth" label="产品过期时间" :required="isOff">
           <el-date-picker
             v-model="UpdateTravelAgencyProducts.gl_ExpireTime"
             type="date"
@@ -160,11 +157,12 @@
           >
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="是否可售" :label-width="formLabelWidth"  :required="isOff">
+        <el-form-item label="是否可售" :label-width="formLabelWidth" :required="isOff">
           <el-select v-model="UpdateTravelAgencyProducts.updateAgencyVal" placeholder="请选择是否可售">
             <el-option label="是" value="1"></el-option>
             <el-option label="否" value="0"></el-option>
           </el-select>
+          <span style="color: green"><span style="color: #f60">温馨提示:</span>(0:否;1:是)</span>
         </el-form-item>
         <el-form-item label="产品内容" :label-width="formLabelWidth">
           <el-input v-model="UpdateTravelAgencyProducts.gl_Content" auto-complete="off"></el-input>
@@ -198,14 +196,18 @@
   import publicInit from '../assets/js/public'
   import {JudgeInput} from '../assets/js/universal'
   import {POST} from '../assets/js/universal'
-  export default{
+
+  export default {
     name: '',
-    data(){
+    data() {
       return {
-        total:0,
-        currentPage1:1,
-        isOff:true,
-        initTravel:'',//初始化搜索
+        restaurants: [],
+        timeout: null,
+        userName: "",
+        total: 0,
+        currentPage1: 1,
+        isOff: true,
+        initTravel: '',//初始化搜索
         options: [
           {
             value: '1',
@@ -224,210 +226,246 @@
             label: '全部'
           }
         ],
-        optionVals:[],
+        optionVals: [],
         value: '',
-        content:'',
-        addTravelAgencyProducts:false,
-        updateTravelAgency:false,
-        formLabelWidth:'120px',
-        scenicUsersKeyWordVal:'',
-        TravelAgencyVal:'',
-        AddTravelAgencyProducts:{
-          glID:'',
-          glTitle:'',
-          glPrice:'',
-          dateVal:'',
-          addTravelAgencyVal:'',
-          glContent:'',
-          glRemark:''
+        content: '',
+        addTravelAgencyProducts: false,
+        updateTravelAgency: false,
+        formLabelWidth: '120px',
+        scenicUsersKeyWordVal: '',
+        TravelAgencyVal: '',
+        AddTravelAgencyProducts: {
+          glTouristBussinessID: '',
+          glID: '',
+          glTitle: '',
+          glPrice: '',
+          dateVal: '',
+          addTravelAgencyVal: '',
+          glContent: '',
+          glRemark: ''
         }
       }
     },
-    computed:mapGetters([
-        'initTravelAgencyProducts',
-        'managementUserKeyWord',
-        'scenicUsersKeyWord',
-        'UpdateTravelAgencyProducts'
+    computed: mapGetters([
+      'initTravelAgencyProducts',
+      'managementUserKeyWord',
+      'scenicUsersKeyWord',
+      'UpdateTravelAgencyProducts'
     ]),
-    methods:{
-      handleCurrentChange(num){
-        this.initData(num,{title:'',username:'',itemName:''})
+    methods: {
+      loadAll(num, name) {
+        var _this = this
+        var GetSceneryList = {
+          loginUserID: 'huileyou',
+          loginUserPass: 123,
+          userID: '',
+          name: name ? name : '',
+          isDelete: 0,
+          createFrom: '',
+          createTo: '',
+          page: num,
+          rows: 5,
+        }
+        //旅行社商户查询
+        return new Promise((relove, reject) => {
+          this.$store.dispatch('travelUserSeach',GetSceneryList)
+            .then(data=>{
+              console.log(data)
+              relove(data);
+            })
+        })
+      },
+      querySearchAsync(queryString, cb) {
+        this.loadAll(1, queryString).then(data => {
+          data.touristBussinessList = data.touristBussinessList.map(item => {
+            return {
+              id: item.tb_UserID,
+              value: item.tb_Name
+            }
+          })
+          this.restaurants = data.touristBussinessList;
+          clearTimeout(this.timeout);
+          this.timeout = setTimeout(() => {
+            cb(this.restaurants);
+          }, 10);
+        })
+
+      },
+      handleSelect(item) {
+        this.userName = item.value;
+        this.AddTravelAgencyProducts.glTouristBussinessID = item.id;
+      },
+      updateHandleSelect(item){
+        this.userName = item.value;
+        this.UpdateTravelAgencyProducts.glTouristBussinessID = item.id;
+      },
+      handleCurrentChange(num) {
+        this.initData(num, {title: '', username: '', itemName: ''})
       },
       //添加
-      addTravelAgencyProductsUser(){
+      addTravelAgencyProductsUser() {
         this.addTravelAgencyProducts = true;
         this.$store.commit('setTranstionFalse')
       },
-      initData(page,options){
-        POST('http://114.55.248.116:1111/TravelAgentService.asmx/SelectGoodList',{
-          loginUserID:'huileyou',
-          loginUserPass:123,
-          UserName:options.username,
-          ItemName:options.itemName,
-          Title:options.title,
-          IsDelete:0,
-          Page:page,
-          Rows:5
-        },(data)=>{
-          var data = JSON.parse(data);
-          publicInit.isBackCode(data,this)
-          this.total = Number(data.total);
-          if(Number(data.backCode)==200){
-            if(!data.goodsList.length){
-              this.$message({
-                showClose: true,
-                message: '获取产品列表失败,对应名称不正确！',
-                type: 'error'
-              });
-              this.$store.commit('clearTravelAgency');
-              return;
-            }
-            this.$message({
-              showClose: true,
-              message: data.backResult,
-              type: 'success'
-            });
-            this.$store.commit('initTravelAgency',data.goodsList);
-          }
-        })
+      initData(page, options) {
+        var SelectGoodList = {
+          loginUserID: 'huileyou',
+          loginUserPass: 123,
+          userName: options.username,
+          itemName: options.itemName,
+          title: options.title,
+          isDelete: 0,
+          page: page,
+          rows: 5
+        }
+      //查询并添加旅行社产品列表
+        this.$store.dispatch('addTravelProductList',SelectGoodList)
+          .then((data)=>{
+            this.total = Number(data.total)
+              if (!data.goodsList.length) {
+                this.$message({
+                  showClose: true,
+                  message: '获取产品列表失败,对应名称不正确！',
+                  type: 'error'
+                });
+                this.$store.commit('clearTravelAgency');
+                return;
+              }
+            this.$store.commit('initTravelAgency', data.goodsList);
+          })
+
       },
       //筛选
-      search(){
-        switch (Number(this.value)){
+      search() {
+        switch (Number(this.value)) {
           case 1:
-            this.initData(1,{title:'',username:this.content,itemName:''})
+            this.initData(1, {title: '', username: this.content, itemName: ''})
             break;
           case 2:
-            this.initData(1,{title:'',username:'',itemName:this.content})
+            this.initData(1, {title: '', username: '', itemName: this.content})
             break;
           case 3:
-            this.initData(1,{title:this.content,username:'',itemName:''})
+            this.initData(1, {title: this.content, username: '', itemName: ''})
             break;
           default:
-            this.initData(1,{title:'',username:'',itemName:''})
+            this.initData(1, {title: '', username: '', itemName: ''})
             break;
         }
       },
       //添加产品提交
-      dialogAddTravelAgencyProducts(){
-        JudgeInput(this,{
-          scenicUsersKeyWordVal:this.scenicUsersKeyWordVal,
-          TravelAgencyVal:this.TravelAgencyVal,
-          glID:this.AddTravelAgencyProducts.glID,
-          glTitle:this.AddTravelAgencyProducts.glTitle,
-          glPrice:this.AddTravelAgencyProducts.glPrice,
-          dateVal:this.AddTravelAgencyProducts.dateVal,
-          addTravelAgencyVal:this.AddTravelAgencyProducts.addTravelAgencyVal,
-          glContent:this.AddTravelAgencyProducts.glContent,
-          glRemark:this.AddTravelAgencyProducts.glRemark,
-        },'addTravelAgencyProducts')
-
-        POST('http://114.55.248.116:1111/TravelAgentService.asmx/AddGood',{
-          loginUserID:'huileyou',
-          loginUserPass:123,
-          glID:this.AddTravelAgencyProducts.glID,
-          glTitle:this.AddTravelAgencyProducts.glTitle,
-          glPrice:this.AddTravelAgencyProducts.glPrice,
-          glExpireTime:this.AddTravelAgencyProducts.dateVal,
-          glRemark:this.AddTravelAgencyProducts.glRemark,
-          glCanSell:this.AddTravelAgencyProducts.addTravelAgencyVal,
-          glContent:this.AddTravelAgencyProducts.glContent,
-          glTouristBussinessID:this.scenicUsersKeyWordVal,
-          glItemInfoID:this.TravelAgencyVal,
-          glShowImage1URL:'',
-          glShowImage2URL:'',
-          glShowImage3URL:''
-        },(data)=>{
-          var code = JSON.parse(data);
-          publicInit.isBackCode(code,this)
-          if(Number(code.backCode)==200){
-            this.$message({
-              showClose: true,
-              message: code.backResult,
-              type: 'success'
-            });
-            this.initData(1,{title:'',username:'',itemName:''})
-//            this.$store.commit('addAgencyProducts',{
-//              glID:this.AddTravelAgencyProducts.glID,
-//              glTitle:this.AddTravelAgencyProducts.glTitle,
-//              glPrice:this.AddTravelAgencyProducts.glPrice,
-//              glExpireTime:this.AddTravelAgencyProducts.dateVal,
-//              glRemark:this.AddTravelAgencyProducts.glRemark,
-//              glCanSell:this.AddTravelAgencyProducts.addTravelAgencyVal,
-//              glContent:this.AddTravelAgencyProducts.glContent,
-//              glTouristBussinessID:this.scenicUsersKeyWordVal,
-//              glItemInfoID:this.TravelAgencyVal,
-//              glShowImage1URL:'',
-//              glShowImage2URL:'',
-//              glShowImage3URL:''
-//            })
+      dialogAddTravelAgencyProducts() {
+        JudgeInput(this, {
+          scenicUsersKeyWordVal: this.userName,
+          TravelAgencyVal: this.TravelAgencyVal,
+          glID: this.AddTravelAgencyProducts.glID,
+          glTitle: this.AddTravelAgencyProducts.glTitle,
+          glPrice: this.AddTravelAgencyProducts.glPrice,
+          dateVal: this.AddTravelAgencyProducts.dateVal,
+          addTravelAgencyVal: this.AddTravelAgencyProducts.addTravelAgencyVal,
+          glContent: this.AddTravelAgencyProducts.glContent,
+          glRemark: this.AddTravelAgencyProducts.glRemark,
+        }, 'addTravelAgencyProducts')
+        var AddGood = {
+          loginUserID: 'huileyou',
+          loginUserPass: 123,
+          glID: this.AddTravelAgencyProducts.glID,
+          glTitle: this.AddTravelAgencyProducts.glTitle,
+          glPrice: this.AddTravelAgencyProducts.glPrice,
+          glExpireTime: this.AddTravelAgencyProducts.dateVal,
+          glRemark: this.AddTravelAgencyProducts.glRemark,
+          glCanSell: this.AddTravelAgencyProducts.addTravelAgencyVal,
+          glContent: this.AddTravelAgencyProducts.glContent,
+          glTouristBussinessID: this.AddTravelAgencyProducts.glTouristBussinessID,
+          glItemInfoID: this.TravelAgencyVal,
+          glShowImage1URL: '',
+          glShowImage2URL: '',
+          glShowImage3URL: ''
+        }
+        this.$http.post('http://114.55.248.116:1111/TravelAgentService.asmx/AddGood',{
+          paramJson: JSON.stringify(AddGood)
+        },{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
-          this.addTravelAgencyProducts = false
         })
+          .then(data=>{
+            var data = data.data;
+            publicInit.isBackCode(data, this)
+            if (Number(data.backCode) == 200) {
+              this.$message({
+                showClose: true,
+                message: data.backResult,
+                type: 'success'
+              });
+              this.initData(1, {title: '', username: '', itemName: ''})
+            }
+            this.addTravelAgencyProducts = false
+          })
       },
       //修改初始化
-      updateTravelAgencyProducts(id){
+      updateTravelAgencyProducts(id) {
         this.$store.commit('setTranstionFalse')
         this.updateTravelAgency = true;
-        this.$store.commit('updateInitTravelAgency',id)
+        this.$store.commit('updateInitTravelAgency', id)
       },
       //修改产品提交
-      dialogUpdateTravelAgencyProducts(){
-        POST('http://114.55.248.116:1111/TravelAgentService.asmx/UpdateGood',{
-          loginUserID:'huileyou',
-          loginUserPass:123,
-          glID:this.UpdateTravelAgencyProducts.gl_ID,
-          glTitle:this.UpdateTravelAgencyProducts.gl_Title,
-          glPrice:this.UpdateTravelAgencyProducts.gl_Price,
-          glExpireTime:this.UpdateTravelAgencyProducts.gl_ExpireTime,
-          glRemark:this.UpdateTravelAgencyProducts.gl_Remark,
-          glCanSell:this.UpdateTravelAgencyProducts.updateAgencyVal,
-          glContent:this.UpdateTravelAgencyProducts.gl_Content,
-          glTouristBussinessID:this.scenicUsersKeyWordVal,
-          glItemInfoID:this.TravelAgencyVal,
-          glShowImage1URL:'',
-          glShowImage2URL:'',
-          glShowImage3URL:''
-        },(data)=>{
-          var code = JSON.parse(data);
-          publicInit.isBackCode(code,this)
-          if(Number(code.backCode)==200) {
+      dialogUpdateTravelAgencyProducts() {
+        var UpdateGood = {
+          loginUserID: 'huileyou',
+          loginUserPass: 123,
+          glID: this.UpdateTravelAgencyProducts.gl_ID,
+          glTitle: this.UpdateTravelAgencyProducts.gl_Title,
+          glPrice: this.UpdateTravelAgencyProducts.gl_Price,
+          glExpireTime: this.UpdateTravelAgencyProducts.gl_ExpireTime,
+          glRemark: this.UpdateTravelAgencyProducts.gl_Remark,
+          glCanSell: this.UpdateTravelAgencyProducts.updateAgencyVal,
+          glContent: this.UpdateTravelAgencyProducts.gl_Content,
+          glTouristBussinessID: this.UpdateTravelAgencyProducts.gl_TouristBussinessID,
+          glItemInfoID: this.TravelAgencyVal
+        }
+        this.$store.dispatch('Tmodifyravelroduct',UpdateGood)
+          .then(()=>{
             this.$message({
-              showClose: true,
-              message: code.backResult,
+              message: '修改成功！',
               type: 'success'
             });
-            this.initData(1,{title:'',username:'',itemName:''})
-//            this.$store.commit('updateNewTravelAgency',Object.assign(this.UpdateTravelAgencyProducts,{TravelAgencyVal:this.TravelAgencyVal,scenicUsersKeyWordVal:this.scenicUsersKeyWordVal}))
-          }
-          this.updateTravelAgency = false;
-        })
+            this.initData(1, {title: '', username: '', itemName: ''})
+          },err=>{
+            this.$message({
+              message: err,
+              type: 'error'
+            });
+          })
+        this.updateTravelAgency = false;
       },
       //删除产品
-      deleteTravelAgencyProducts(id){
-        POST('http://114.55.248.116:1111/TravelAgentService.asmx/DeleteGood',{
-          loginUserID:'huileyou',
-          loginUserPass:123,
-          gl_ID:id
-        },(data)=>{
-          var code = JSON.parse(data);
-          publicInit.isBackCode(code,this)
-          if(Number(code.backCode)==200){
+      deleteTravelAgencyProducts(id) {
+        var DeleteGood = {
+          loginUserID: 'huileyou',
+          loginUserPass: 123,
+          glID: id
+        }
+        this.$store.dispatch('deleteProducts',DeleteGood)
+          .then(()=>{
             this.$message({
               showClose: true,
-              message: code.backResult,
+              message: '删除成功！',
               type: 'success'
             });
-            this.initData(1,{title:'',username:'',itemName:''})
-            this.$store.commit('filterTravelAgency',id);
-          }
-        })
+            this.initData(1, {title: '', username: '', itemName: ''})
+            this.$store.commit('filterTravelAgency', id);
+          },err=>{
+            this.$message({
+              message: err,
+              type: 'error'
+            });
+          })
       }
     }
   }
 </script>
 <style scoped>
-  .block{
+  .block {
     margin-bottom: 20px;
   }
 </style>

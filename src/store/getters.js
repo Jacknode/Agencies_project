@@ -3,50 +3,49 @@
  */
 export default {
   //用户系统那边的用户
-  users(state){
+  users(state) {
     return state.users;
   },
   //初始化动画
-  transtionActive(state){
+  transtionActive(state) {
     return state.transtionActive
   },
   //用户登录信息
-  userInfo(state){
+  userInfo(state) {
     return state.userInfo;
   },
   //初始化景区用户
-  scenicUsers(state){
+  scenicUsers(state) {
     return state.scenicUsers
   },
-  scenicUsersKeyWord(state){
+  scenicUsersKeyWord(state) {
     return state.scenicUsersKeyWord
   },
   //初始化修改商户数据
-  updateBusinessUser(state){
+  updateBusinessUser(state) {
     return state.updateBusinessUser
   },
   //初始化旅行社栏目
-  managementUserKeyWord(state){
+  managementUserKeyWord(state) {
     return state.managementUserKeyWord
   },
   //初始化修改数据
-  initUpdateManagement(state){
+  initUpdateManagement(state) {
     return state.initManagement;
   },
   //产品信息
-  initTravelAgencyProducts(state){
+  initTravelAgencyProducts(state) {
     return state.initTravelAgencyProducts;
   },
   //初始化修改产品数据
-  UpdateTravelAgencyProducts(state){
+  UpdateTravelAgencyProducts(state) {
     return state.updateInitAgencyProducts
   },
-  //初始化订单信息
-  initTravelAgencyOrder(state){
-    return state.initTravelAgencyOrder;
-  },
   //初始化修改订单
-  initUpdateOrders(state){
+  initUpdateOrders(state) {
     return state.initUpdateOrders;
   },
+  orderParentList: state => state.orderParentList,
+  orderChildList: state => state.orderChildList,
+  screenOrderChildArray:state => state.screenOrderChildArray
 }
